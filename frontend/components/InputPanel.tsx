@@ -20,10 +20,10 @@ interface InputPanelProps {
 }
 
 export function InputPanel({ onSubmit, loading }: InputPanelProps) {
-  const [entries, setEntries] = useState<string[]>(['A->B', 'B->C', 'C->D']);
-  const [userId, setUserId] = useState('john_doe_42');
-  const [email, setEmail] = useState('john@example.com');
-  const [roll, setRoll] = useState('21BCE0001');
+  const [entries, setEntries] = useState<string[]>([]);
+  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState('');
+  const [roll, setRoll] = useState('');
   const [newEntry, setNewEntry] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
