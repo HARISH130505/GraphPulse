@@ -15,17 +15,27 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Hierarchy } from '@/lib/types';
+import { Monitor } from 'lucide-react';
 
 const DEPTH_COLORS = [
-  '#3b82f6',
-  '#8b5cf6',
-  '#06b6d4',
-  '#10b981',
-  '#f59e0b',
-  '#ec4899',
+  'var(--accent-cyan)',
+  'var(--accent-purple)',
+  'var(--accent-blue)',
+  'var(--accent-emerald)',
+  'var(--accent-amber)',
+  'var(--accent-rose)',
 ];
 
-/** Recursively compute depth map: node → depth */
+// Fallback exact hexes if CSS vars don't parse well in ReactFlow elements directly
+const HEX_COLORS = [
+  '#22d3ee', // cyan
+  '#c084fc', // purple
+  '#60a5fa', // blue
+  '#34d399', // emerald
+  '#fbbf24', // amber
+  '#fb7185', // rose
+];
+
 function getDepthMap(
   node: string,
   tree: Record<string, unknown>,
@@ -40,7 +50,6 @@ function getDepthMap(
   return map;
 }
 
-/** Layout nodes in a simple layered BFS layout */
 function buildLayout(
   root: string,
   tree: Record<string, unknown>,
@@ -54,15 +63,16 @@ function buildLayout(
           position: { x: 200, y: 150 },
           data: { label: root },
           style: {
-            background: 'rgba(239,68,68,0.15)',
-            border: '2px solid rgba(239,68,68,0.6)',
-            color: '#fca5a5',
-            borderRadius: 10,
+            background: 'rgba(251, 113, 133, 0.1)',
+            border: '1px solid rgba(251, 113, 133, 0.4)',
+            color: '#fb7185',
+            borderRadius: '12px',
             fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 700,
             fontSize: 16,
-            padding: '10px 16px',
-            boxShadow: '0 0 20px rgba(239,68,68,0.3)',
+            padding: '12px 24px',
+            boxShadow: '0 0 30px rgba(251, 113, 133, 0.3)',
+            backdropFilter: 'blur(8px)',
           },
         },
       ],
@@ -74,59 +84,62 @@ function buildLayout(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  // Group by depth
   const byDepth = new Map<number, string[]>();
   for (const [node, d] of depthMap) {
     if (!byDepth.has(d)) byDepth.set(d, []);
     byDepth.get(d)!.push(node);
   }
 
-  const X_GAP = 140;
-  const Y_GAP = 100;
+  const X_GAP = 180;
+  const Y_GAP = 120;
 
   for (const [depth, nodesAtDepth] of byDepth) {
     const totalWidth = (nodesAtDepth.length - 1) * X_GAP;
     nodesAtDepth.forEach((nodeId, i) => {
-      const color = DEPTH_COLORS[depth % DEPTH_COLORS.length];
+      const hexColor = HEX_COLORS[depth % HEX_COLORS.length];
       nodes.push({
         id: nodeId,
         position: {
           x: i * X_GAP - totalWidth / 2 + 300,
-          y: depth * Y_GAP + 40,
+          y: depth * Y_GAP + 60,
         },
         data: { label: nodeId },
         style: {
-          background: `${color}22`,
-          border: `2px solid ${color}66`,
-          color,
-          borderRadius: 10,
+          background: `rgba(0,0,0,0.6)`,
+          border: `1px solid ${hexColor}66`,
+          color: '#fff',
+          borderRadius: '12px',
           fontFamily: 'JetBrains Mono, monospace',
           fontWeight: 700,
           fontSize: 15,
-          padding: '8px 14px',
-          boxShadow: `0 0 16px ${color}33`,
-          minWidth: 50,
+          padding: '10px 20px',
+          boxShadow: `inset 0 0 20px ${hexColor}15, 0 10px 30px -10px rgba(0,0,0,0.8)`,
+          textShadow: `0 0 10px ${hexColor}`,
+          minWidth: 60,
           textAlign: 'center',
+          backdropFilter: 'blur(12px)',
         },
       });
     });
   }
 
-  // Build edges by traversing tree
   function collectEdges(parentId: string, subtree: Record<string, unknown>) {
     for (const childId of Object.keys(subtree)) {
+      const parentColor = HEX_COLORS[depthMap.get(parentId)! % HEX_COLORS.length];
       edges.push({
         id: `${parentId}-${childId}`,
         source: parentId,
         target: childId,
-        animated: false,
+        animated: true,
         style: {
-          stroke: DEPTH_COLORS[depthMap.get(parentId)! % DEPTH_COLORS.length] + 'aa',
+          stroke: parentColor,
           strokeWidth: 2,
+          opacity: 0.6,
+          filter: `drop-shadow(0 0 4px ${parentColor})`
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: DEPTH_COLORS[depthMap.get(parentId)! % DEPTH_COLORS.length] + 'aa',
+          color: parentColor,
         },
       });
       collectEdges(childId, (subtree as Record<string, Record<string, unknown>>)[childId]);
@@ -134,7 +147,6 @@ function buildLayout(
   }
 
   collectEdges(root, tree);
-
   return { nodes, edges };
 }
 
@@ -173,37 +185,60 @@ export function GraphView({ hierarchies }: GraphViewProps) {
   }, [allNodes, allEdges, setNodes, setEdges]);
 
   return (
-    <div className="glass rounded-2xl overflow-hidden" style={{ height: 400 }}>
-      <div className="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2">
-        <span className="text-sm font-700 text-white">Graph Visualization</span>
-        <span className="tag tag-blue">{hierarchies.length} component{hierarchies.length !== 1 && 's'}</span>
-        <span className="ml-auto text-[11px] text-[var(--text-muted)]">Drag to pan · Scroll to zoom</span>
+    <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10" style={{ height: 500 }}>
+      {/* Header bar */}
+      <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-white/5">
+            <Monitor size={18} className="text-[var(--accent-blue)]" />
+          </div>
+          <div>
+            <span className="text-base font-700 text-white tracking-tight">Topology Canvas</span>
+            <span className="ml-3 tag tag-cyan">{hierarchies.length} Component{hierarchies.length !== 1 && 's'}</span>
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-cyan)] shadow-[0_0_8px_var(--accent-cyan)]"/>
+            <span className="text-[10px] text-white/50 uppercase tracking-widest font-600">Acyclic</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[var(--accent-rose)] shadow-[0_0_8px_var(--accent-rose)]"/>
+            <span className="text-[10px] text-white/50 uppercase tracking-widest font-600">Cyclic</span>
+          </div>
+        </div>
       </div>
-      <div style={{ height: 356 }}>
+
+      {/* Canvas */}
+      <div style={{ height: 435 }} className="relative bg-[#030712]">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none z-0" />
+        
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           fitView
-          fitViewOptions={{ padding: 0.3 }}
+          fitViewOptions={{ padding: 0.4 }}
           proOptions={{ hideAttribution: true }}
+          className="z-10"
         >
           <Background
             variant={BackgroundVariant.Dots}
-            gap={20}
-            size={1}
+            gap={24}
+            size={2}
             color="rgba(255,255,255,0.06)"
           />
-          <Controls showInteractive={false} />
+          <Controls showInteractive={false} className="border-white/10 shadow-xl" />
           <MiniMap
-            nodeColor={(n) =>
-              (n.style?.border as string)?.match(/#[0-9a-f]+/i)?.[0] ?? '#3b82f6'
-            }
+            nodeColor={(n) => (n.style?.color as string) || '#fff'}
+            maskColor="rgba(3, 7, 18, 0.7)"
             style={{
-              background: 'rgba(10,11,15,0.8)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 8,
+              background: 'rgba(11, 15, 25, 0.9)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             }}
           />
         </ReactFlow>
