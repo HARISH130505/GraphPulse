@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react';
 import { Plus, X, Trash2, Download, Zap, Database } from 'lucide-react';
 import { BFHLRequest } from '@/lib/types';
-import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PRESETS = [
