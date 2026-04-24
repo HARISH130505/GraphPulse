@@ -50,7 +50,7 @@ export function SimulationStepper({ current }: SimulationStepperProps) {
               className="flex items-center gap-4 px-4 py-3 rounded-xl border relative overflow-hidden"
             >
               {/* Active glow sweep */}
-              {isActive && (
+              {isActive && current !== 'done' && (
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(34,211,238,0.1)] to-transparent"
                   animate={{ x: ['-100%', '200%'] }}
@@ -61,18 +61,19 @@ export function SimulationStepper({ current }: SimulationStepperProps) {
               {/* Icon */}
               <div className={clsx(
                 'w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0 transition-all z-10',
-                isActive  ? 'bg-[var(--accent-cyan)]/20 shadow-[0_0_15px_rgba(34,211,238,0.3)] border border-[var(--accent-cyan)]/30' : 
-                isDone    ? 'bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]' : 
-                'bg-black/20 text-white/50'
+                isActive && current !== 'done' ? 'bg-[var(--accent-cyan)]/20 shadow-[0_0_15px_rgba(34,211,238,0.3)] border border-[var(--accent-cyan)]/30' : 
+                isDone || current === 'done' ? 'bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]' : 
+                'bg-black/20 text-white/70'
               )}>
-                {isDone ? '✓' : step.icon}
+                {isDone || (isActive && current === 'done') ? '✓' : step.icon}
               </div>
 
               {/* Text */}
               <div className="flex-1 min-w-0 z-10">
                 <p className={clsx(
                   'text-sm font-700 leading-none mb-1.5 tracking-wide',
-                  isActive ? 'text-[var(--accent-cyan)]' : isDone ? 'text-[var(--accent-emerald)]' : 'text-white/80'
+                  isActive && current !== 'done' ? 'text-[var(--accent-cyan)]' : 
+                  isDone || current === 'done' ? 'text-[var(--accent-emerald)]' : 'text-white/80'
                 )}>
                   {step.label}
                 </p>
@@ -80,7 +81,7 @@ export function SimulationStepper({ current }: SimulationStepperProps) {
               </div>
 
               {/* Spinner */}
-              {isActive && (
+              {isActive && current !== 'done' && (
                 <div className="w-5 h-5 border-2 border-[var(--accent-cyan)]/30 border-t-[var(--accent-cyan)] rounded-full animate-spin z-10" />
               )}
             </motion.div>

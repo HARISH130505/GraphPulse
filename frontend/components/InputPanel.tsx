@@ -77,9 +77,9 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
       {/* User fields */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'User ID', val: userId, set: setUserId, ph: 'john_doe' },
-          { label: 'Email', val: email, set: setEmail, ph: 'you@email.com' },
-          { label: 'Roll No.', val: roll, set: setRoll, ph: '21BCE0001' },
+          { label: 'User ID', val: userId, set: setUserId, ph: 'your_username' },
+          { label: 'Email', val: email, set: setEmail, ph: 'your_email' },
+          { label: 'Register Number', val: roll, set: setRoll, ph: 'your_reg_num' },
         ].map(({ label, val, set, ph }) => (
           <div key={label} className="flex flex-col gap-1.5">
             <label className="text-[10px] font-700 text-[var(--text-muted)] uppercase tracking-widest pl-1">
@@ -89,7 +89,7 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
               value={val}
               onChange={(e) => set(e.target.value)}
               placeholder={ph}
-              className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[var(--accent-cyan)] focus:bg-black/40 transition-all font-mono"
+              className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[var(--accent-cyan)] focus:bg-black/40 transition-all font-mono"
             />
           </div>
         ))}
@@ -103,7 +103,7 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
           </label>
           <div className="flex gap-2">
             {PRESETS.map((p) => (
-              <button key={p.label} onClick={() => loadPreset(p.data)} className="text-[10px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded transition-colors text-white/60 hover:text-white" title={`Load ${p.label}`}>
+              <button key={p.label} onClick={() => loadPreset(p.data)} className="text-[10px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded transition-colors text-white/80 hover:text-white" title={`Load ${p.label}`}>
                 {p.icon} {p.label}
               </button>
             ))}
@@ -122,7 +122,7 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
             onChange={(e) => setNewEntry(e.target.value.toUpperCase())}
             onKeyDown={handleKeyDown}
             placeholder="e.g. A->B"
-            className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-white/20 focus:outline-none focus:border-[var(--accent-cyan)] focus:bg-black/40 transition-all shadow-inner"
+            className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-white/40 focus:outline-none focus:border-[var(--accent-cyan)] focus:bg-black/40 transition-all shadow-inner"
           />
           <button onClick={addEntry} className="bg-white/10 hover:bg-white/20 text-white rounded-xl px-4 flex items-center justify-center transition-all">
             <Plus size={18} />
@@ -133,7 +133,7 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
         <div className="bg-black/20 border border-white/5 rounded-xl p-3 min-h-[120px] max-h-[160px] overflow-y-auto flex flex-wrap gap-2 content-start">
           <AnimatePresence>
             {entries.length === 0 ? (
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-white/20 italic w-full text-center py-8">
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-white/50 italic w-full text-center py-8">
                 No edges defined. Add some or pick a preset.
               </motion.p>
             ) : (
@@ -146,7 +146,7 @@ export function InputPanel({ onSubmit, loading }: InputPanelProps) {
                   className="flex items-center gap-1.5 bg-[var(--accent-blue)]/10 border border-[var(--accent-blue)]/20 rounded-lg pl-3 pr-1 py-1 text-sm font-mono text-blue-200"
                 >
                   {e}
-                  <button onClick={() => removeEntry(i)} className="p-1 rounded-md hover:bg-white/10 text-white/40 hover:text-[var(--accent-rose)] transition-colors">
+                  <button onClick={() => removeEntry(i)} className="p-1 rounded-md hover:bg-white/10 text-white/60 hover:text-[var(--accent-rose)] transition-colors">
                     <X size={12} />
                   </button>
                 </motion.div>

@@ -56,7 +56,7 @@ function TreeNode({
 
         {/* Depth badge */}
         {!isCyclic && (
-          <span className="text-[10px] text-white/30 ml-auto border border-white/5 rounded px-1.5 py-0.5">
+          <span className="text-[10px] text-white/50 ml-auto border border-white/10 rounded px-1.5 py-0.5">
             d:{depth}
           </span>
         )}
@@ -128,7 +128,7 @@ export function TreeViewer({ hierarchies }: TreeViewerProps) {
                 ? h.has_cycle
                   ? 'bg-[var(--accent-rose)]/10 border-[var(--accent-rose)]/40 text-[var(--accent-rose)] shadow-[0_0_15px_rgba(251,113,133,0.2)]'
                   : 'bg-[var(--accent-cyan)]/10 border-[var(--accent-cyan)]/40 text-[var(--accent-cyan)] shadow-[0_0_15px_rgba(34,211,238,0.2)]'
-                : 'bg-black/20 border-white/5 text-white/50 hover:text-white/80 hover:border-white/20 hover:bg-white/5'
+                : 'bg-black/20 border-white/10 text-white/70 hover:text-white hover:border-white/30 hover:bg-white/10'
             )}
           >
             {h.has_cycle ? '🔄 ' : '🌲 '} 
@@ -158,8 +158,8 @@ export function TreeViewer({ hierarchies }: TreeViewerProps) {
                     <span className="text-4xl relative z-10 drop-shadow-[0_0_10px_rgba(251,113,133,0.5)]">🔄</span>
                   </div>
                   <p className="text-[var(--accent-rose)] text-sm font-700 tracking-wide mt-2">Cyclic Component</p>
-                  <p className="text-white/40 text-xs text-center max-w-[200px] leading-relaxed">
-                    Root: <span className="font-mono text-white/80">{active.root}</span>
+                  <p className="text-white/60 text-xs text-center max-w-[200px] leading-relaxed">
+                    Root: <span className="font-mono text-white/90">{active.root}</span>
                     <br/>Infinite back-edge detected.
                   </p>
                 </div>
